@@ -1,0 +1,95 @@
+const App = () => {
+  const [person, setPersons] = useState ([
+    {name: 'Arto Hellas',
+  id: 0}
+  ])
+  const [newName, setNewName] = useState('')
+  const [number, setNumber] = useState([{
+    number: 4168310291,
+    id: 0
+  }])
+  const [newNumber, setNewNumber] = useState('')
+
+  const handleNoteChange = (event) => {
+    console.log(event.target.value)
+    setNewName(event.target.value)
+  }
+
+  const handleNumberChange = (event) => {
+    console.log(event.target.value)
+    setNewNumber(event.target.value)
+  }
+
+  const addNumber = (event) => {
+    event.preventDefault()
+    const newPhone = {
+      number: newNumber,
+      id: number.length + 1
+    }
+
+    setNumber(number.concat(newPhone))
+    setNewNumber('')
+  }
+  
+  const addPersons = (event) => {
+    event.preventDefault()
+    console.log('i clicked the button', event.target.value)
+    const newPerson = {
+      name: newName,
+      id: person.length + 1
+    }
+    const isDuplicate = person.some(p => p.name === newPerson.name)
+
+  if (isDuplicate) {
+  alert(`${newName} This name is already in the phonebook`) 
+  return
+  } else {
+  console.log('This name is not a duplicate')
+}
+    setPersons(person.concat(newPerson))
+    setNewName('')
+  }
+
+  const handleSubmit = (event) => {
+    event.preventDefault()
+    addNumber(event)
+    addPersons(event)
+  }
+
+  return(
+
+    <div>
+    <h2> Phonebook </h2>
+    <form onSubmit={handleSubmit}>
+      <div>
+        name: <input
+        value = {newName}
+        onChange={handleNoteChange}
+        />
+
+        phone: <input
+        value = {newNumber}
+        onChange={handleNumberChange}
+        />
+
+        <button type="submit"> Save </button>
+         </div>
+    </form>
+    <h2>Numbers</h2>
+    <div>
+    <h3>
+      {person.map((p)=> (
+      <div key={p.id}> {p.name} </div>
+      ))}
+      {number.map((n)=> (
+      <div key={n.id}>{n.number}</div>
+      ))}
+    </h3>
+    </div>
+    
+  </div>
+
+  )
+}
+
+export default App
