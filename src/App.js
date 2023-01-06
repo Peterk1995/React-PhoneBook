@@ -1,5 +1,6 @@
 import {useState, useEffect} from 'react'
-import axios from 'axios'
+
+import noteService from './services/persons'
 
 // Just a comment I added in
 
@@ -36,33 +37,19 @@ const Person = ({ name, number }) => {
   )
 }
 
-
-
 const App = () => {
   const [persons, setPersons] = useState([])
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
 
-  const hook = () => {
-    console.log('effect')
-    axios.get('http://localhost:3001/persons')
+  useEffect(() => {
+    noteService
+    .getAll()
     .then(response => {
-      console.log('promised fulfilled')
+      console.log(response.data)  // Log the data to the console
       setPersons(response.data)
     })
-  }
-
-useEffect(hook, [])
-
-  const handleNoteChange = (event) => {
-    console.log(event.target.value)
-    setNewName(event.target.value)
-  }
-
-  const handleNumberChange = (event) => {
-    console.log(event.target.value)
-    setNewNumber(event.target.value)
-  }
+  }, [])
 
   const addPersons = (event) => {
     event.preventDefault()
@@ -81,17 +68,38 @@ useEffect(hook, [])
   } else {
   console.log('This name is not a duplicate')
 }
-    setPersons(persons.concat(newPerson))
     // reset newNumber to an empty string
       // reset newName to an empty string
+
+      setPersons(persons => [...persons, newPerson])
+      noteService
+        .create(newPerson)
+        .then(returnedPerson => {
+          setNewNumber('')
+          setNewName('')
+        })
+        .catch(error => {
+          console.error(error)
+          setPersons(persons => persons.filter(p => p.name !== newPerson.name))
+          alert('An error occurred while saving the person')
+        })
   }
+
+  const handleNoteChange = (event) => {
+    console.log(event.target.value)
+    setNewName(event.target.value)
+  }
+
+  const handleNumberChange = (event) => {
+    console.log(event.target.value)
+    setNewNumber(event.target.value)
+  }
+
+
 
   const handleSubmit = (event) => {
     event.preventDefault()
     addPersons(event)
-    setNewNumber('')
-    setNewName('')
-    
     // reset newNumber to an empty string
   }
 
@@ -102,6 +110,7 @@ useEffect(hook, [])
       <PersonForm
        handleSubmit={handleSubmit}
        newName={newName}
+       newNumber={newNumber}
        handleNoteChange={handleNoteChange}
        handleNumberChange={handleNumberChange}
        
@@ -110,9 +119,9 @@ useEffect(hook, [])
     <h2>Numbers</h2>
     <div>
     <h3>
-      {persons.map((p) => (
-        <Person key={p.id} name={p.name} number={p.number} />
-      ))}
+    {persons.map((p) => (
+  <Person key={p.id} name={p.name} number={p.number} />
+))}
 
     </h3>
     </div>
